@@ -3,5 +3,11 @@
   "version": "0.2.6",
   "description": "GitHub Custom Emojis, just because",
   "license": "MIT",
-  "repository": "StylishThemes/GitHub-Custom-Emojis"
+  "repository": "StylishThemes/GitHub-Custom-Emojis",
+  "scripts": {
+    "lint": "eslint *.js || true"
+  },
+  "devDependencies": {
+    "eslint": "^5.0.1"
+  }
 }
