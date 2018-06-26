@@ -5,7 +5,8 @@
 // @license     MIT
 // @author      Rob Garrison
 // @namespace   https://github.com/StylishThemes
-// @include     /https?://((gist)\.)?github\.com/
+// @include     https://github.com/*
+// @include     https://gist.github.com/*
 // @grant       GM_addStyle
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -20,12 +21,11 @@
 // @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Custom-Emojis/master/github-custom-emojis.user.js
 // @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Custom-Emojis/master/github-custom-emojis.user.js
 // ==/UserScript==
-/* global jQuery, GM_addStyle, GM_getValue, GM_setValue, GM_xmlhttpRequest, GM_info */
-/* eslint-disable indent, quotes */
+/* global jQuery */
 (function($) {
   'use strict';
 
-  var ghe = {
+  const ghe = {
 
     version : GM_info.script.version,
 
@@ -52,7 +52,7 @@
       // emoji template
       template   : /\$\{name\}/,
       // character to escape in regex
-      charsToEsc : /[-\/\\^$*+?.()|[\]{}]/g
+      charsToEsc : /[-/\\^$*+?.()|[\]{}]/g
     },
 
     defaults : {
@@ -87,7 +87,7 @@
     promises : {},
 
     getStoredValues : function() {
-      var defaults = this.defaults;
+      const defaults = this.defaults;
       this.settings = {
         rangeHeight   : GM_getValue('rangeHeight',   defaults.rangeHeight),
         activeZoom    : GM_getValue('activeZoom',    defaults.activeZoom),
@@ -104,7 +104,7 @@
     },
 
     storeVal : function(key, set, $el) {
-      var tmp,
+      let tmp,
         val = set[key];
       GM_setValue(key, val);
       if (typeof val === 'boolean') {
@@ -127,8 +127,8 @@
     },
 
     setStoredValues : function(reset) {
-      var $el, tmp, len, indx,
-        s = ghe.settings,
+      let $el, tmp, len, indx;
+      const s = ghe.settings,
         d = ghe.defaults,
         $panel = $('#ghe-settings-inner');
 
@@ -187,7 +187,7 @@
 
     updateSettings : function() {
       this.isUpdating = true;
-      var settings = this.settings,
+      const settings = this.settings,
         $panel = $('#ghe-settings-inner');
       settings.rangeHeight   = $panel.find('.ghe-height').val();
       settings.activeZoom    = $panel.find('.ghe-zoom').val();
@@ -208,8 +208,8 @@
     loadEmojiJson : function(update) {
       // only load emoji.json once a day, or after a forced update
       if (update || (new Date().getTime() > this.settings.date + this.vars.delay)) {
-        var indx,
-          promises = [],
+        let indx;
+        const promises = [],
           sources = this.settings.sources,
           len = sources.length;
         for (indx = 0; indx < len; indx++) {
@@ -232,8 +232,8 @@
           GM_xmlhttpRequest({
             method : 'GET',
             url : url,
-            onload : function(response) {
-              var json = false;
+            onload : response => {
+              let json = false;
               try {
                 json = JSON.parse(response.responseText);
               } catch (err) {
@@ -259,9 +259,9 @@
     // to find matching content as it is much faster than scanning each node
     checkPage : function() {
       this.isUpdating = true;
-      var node,
-        indx = 0,
-        parts = this.vars.emojiImgTemplate.split('${name}'), // parts = [':_', ':']
+      let node,
+        indx = 0;
+      const parts = this.vars.emojiImgTemplate.split('${name}'), // parts = [':_', ':']
         // adding "//" starts from document, so if node is defined, don't
         // include it so the search starts from the node
         path = '//*[text()[contains(.,"' + parts[0] + '")]]',
@@ -282,8 +282,8 @@
     },
 
     findEmoji : function(node) {
-      var indx, len, group, match, matchesLen, name,
-        regex = ghe.regex.nameRegex,
+      let indx, len, group, match, matchesLen, name;
+      const regex = ghe.regex.nameRegex,
         matches = [],
         emojis = this.collections,
         str = node.textContent;
@@ -311,10 +311,10 @@
     },
 
     replaceText : function(node, emoji) {
-      var data, pos, imgnode, middlebit, endbit,
-        isCased = this.settings.caseSensitive,
+      let i, data, pos, imgnode, middlebit,
         name = this.vars.emojiImgTemplate.replace(ghe.regex.template, emoji.name),
         skip = 0;
+      const isCased = this.settings.caseSensitive;
       name = isCased ? name : name.toUpperCase();
       // Code modified from highlight-5 (MIT license)
       // http://johannburkard.de/blog/programming/javascript/highlight-javascript-text-higlighting-jquery-plugin.html
@@ -325,12 +325,11 @@
         if (pos >= 0) {
           imgnode = ghe.createEmoji(emoji);
           middlebit = node.splitText(pos);
-          endbit = middlebit.splitText(name.length);
           middlebit.parentNode.replaceChild(imgnode, middlebit);
           skip = 1;
         }
       } else if (node.nodeType === 1 && node.childNodes) {
-        for (var i = 0; i < node.childNodes.length; ++i) {
+        for (i = 0; i < node.childNodes.length; ++i) {
           i += ghe.replaceText(node.childNodes[i], emoji);
         }
       }
@@ -341,7 +340,7 @@
     // and can be customized  to do what you like
     // <img class="emoji" title=":smile:" alt=":smile:" src="x.png" height="20" width="20" align="absmiddle">
     createEmoji : function(emoji) {
-      var el = document.createElement('img');
+      const el = document.createElement('img');
       el.src = emoji.url;
       el.className = ghe.vars.emojiClass + ' emoji';
       el.title = el.alt = ghe.vars.emojiImgTemplate.replace(ghe.regex.template, emoji.name);
@@ -355,9 +354,9 @@
         return 1;
       }
       labels = labels || '';
-      var i, partial,
-        count = 0,
-        isCS = this.settings.caseSensitive,
+      let i, partial,
+        count = 0;
+      const isCS = this.settings.caseSensitive,
         arry = (isCS ? labels : labels.toUpperCase()).split(/[\s,_]+/),
         parts = (isCS ? query : query.toUpperCase()).split(/[,_]/),
         len = parts.length;
@@ -383,7 +382,7 @@
     // init when comment textarea is focused
     initAutocomplete : function($el) {
       if (!$el.data('atwho')) {
-        var indx, imgLen, txtLen, name, group,
+        let indx, imgLen, txtLen, name, group,
           text = [],
           data = [];
         // combine data
@@ -416,7 +415,7 @@
             delay : 400,
             callbacks : {
               matcher: function(flag, subtext) {
-                var regexp = ghe.regex.emojiImgFilter,
+                const regexp = ghe.regex.emojiImgFilter,
                   match = regexp.exec(subtext);
                 // this next line does some magic...
                 // for some reason, without it, moving the caret from "p" to "r" in
@@ -429,8 +428,8 @@
                 }
               },
               filter: function(query, data, searchKey) {
-                var i, item,
-                  len = data.length,
+                let i, item;
+                const len = data.length,
                   _results = [];
                 for (i = 0; i < len; i++) {
                   item = data[i];
@@ -477,7 +476,7 @@
             delay : 400,
             callbacks : {
               matcher: function(flag, subtext) {
-                var regexp = ghe.regex.emojiTxtFilter,
+                const regexp = ghe.regex.emojiTxtFilter,
                   match = regexp.exec(subtext);
                 // this next line does some magic...
                 subtext.match(regexp);
@@ -488,8 +487,8 @@
                 }
               },
               filter: function(query, data, searchKey) {
-                var i, item,
-                  len = data.length,
+                let i, item;
+                  const len = data.length,
                   _results = [];
                 for (i = 0; i < len; i++) {
                   item = data[i];
@@ -508,7 +507,7 @@
                 return items;
               },
               // event parameter adding in atwho.js mod
-              beforeInsert: function(value, $li, event) {
+              beforeInsert: function(value, $li) {
                 return $li.attr('data-emoji');
               }
             }
@@ -521,8 +520,8 @@
 
     addToolbarIcon : function() {
       // add Emoji setting icons
-      var indx, $el,
-        $toolbars = $('.toolbar-commenting'),
+      let indx, $el;
+      const $toolbars = $('.toolbar-commenting'),
         len = $toolbars.length;
       for (indx = 0; indx < len; indx++) {
         $el = $toolbars.eq(indx);
@@ -541,7 +540,7 @@
 
     // dynamic stylesheet
     updateStyleSheet : function() {
-      var range = this.settings.rangeHeight.split(';');
+      const range = this.settings.rangeHeight.split(';');
       ghe.$style.text([
         // img styling - vertically center with set height range
         '.atwho-view li img, #ghe-popup .select-menu-item img, img[alt="ghe-emoji"], .' +
@@ -556,8 +555,8 @@
     },
 
     addBindings : function() {
-      var lastKey,
-        $popup = $('#ghe-popup'),
+      let lastKey;
+      const $popup = $('#ghe-popup'),
         $settings = $('#ghe-settings');
       // Delegated bindings
       $('body')
@@ -568,7 +567,7 @@
         })
         .on('click', '.ghe-collection', function() {
           // open targeted collection
-          var name = $(this).attr('data-group');
+          const name = $(this).attr('data-group');
           ghe.showCollection(name);
         })
         .on('click', '.ghe-emoji', function(e) {
@@ -577,7 +576,7 @@
         })
         .on('click keypress keydown', function(e) {
           clearTimeout(ghe.timer);
-          var panelVisible = $popup.hasClass('in') || $settings.hasClass('in'),
+          const panelVisible = $popup.hasClass('in') || $settings.hasClass('in'),
             openPanel = ghe.vars.keyboardOpen.split('+'),
             key = String.fromCharCode(e.which).toLowerCase();
           // press escape or click outside to close the panel
@@ -646,7 +645,7 @@
 
       // add new source input
       $('#ghe-add-source').on('click', function() {
-        var $panel = $('#ghe-settings-inner');
+        const $panel = $('#ghe-settings-inner');
         // lets not get crazy!
         if ($panel.find('.ghe-source').length < 20) {
           $(ghe.sourceHTML).appendTo($panel.find('.ghe-sources'));
@@ -690,7 +689,7 @@
       // Remove source input - delegated binding
       $('.ghe-settings-wrapper')
         .on('click', '.ghe-remove', function() {
-          var $wrapper = $(this).closest('.ghe-source'),
+          const $wrapper = $(this).closest('.ghe-source'),
             url = $wrapper.find('.ghe-source-input').attr('data-url');
           ghe.removeSource(url);
           $wrapper.remove();
@@ -700,8 +699,8 @@
         .on('focus blur input change', '.ghe-source-input', function(e) {
           if (ghe.busy) { return; }
           ghe.busy = true;
-          var val,
-            $this = $(this);
+          let val;
+          const $this = $(this);
           switch (e.type) {
             case 'focus':
             case 'focusin':
@@ -731,7 +730,7 @@
     },
 
     showFileName : function($el) {
-      var str = $el.attr('data-url'),
+      const str = $el.attr('data-url'),
         v = str.substring(str.lastIndexOf('/') + 1, str.length);
       // show only the file name in the input when blurred
       // unless there is no file name
@@ -751,7 +750,7 @@
 
     openCollections : function($el) {
       ghe.addCollections();
-      var pos = $el.offset();
+      const pos = $el.offset();
       $('#ghe-settings').removeClass('in');
       $('#ghe-popup')
         .addClass('in')
@@ -763,10 +762,10 @@
     },
 
     addCollections : function() {
-      var indx, len, key, group, item, emoji,
-        collections = ghe.collections,
+      let indx, len, key, group, item, emoji,
+        list = [];
+      const collections = ghe.collections,
         range = ghe.settings.rangeHeight.split(';'),
-        list = [],
         items = [];
       // build collections list -
       for (key in collections) {
@@ -805,8 +804,8 @@
     },
 
     showCollection : function(name) {
-      var indx, emoji,
-        range = ghe.settings.rangeHeight.split(';'),
+      let indx, emoji;
+      const range = ghe.settings.rangeHeight.split(';'),
         group = ghe.collections[name].slice(1).sort(ghe.emojiSort),
         list = [],
         len = group.length;
@@ -835,8 +834,8 @@
 
     // add emoji from collection
     addEmoji : function(e, $el) {
-      var val, emoji,
-        $img = $el.find('img'),
+      let val, emoji;
+      const $img = $el.find('img'),
         name = $el.attr('data-name'),
         caretPos = ghe.$currentInput.caret('pos');
       if ($img.length) {
@@ -863,8 +862,8 @@
     },
 
     removeSource : function(url) {
-      var indx,
-        list = [],
+      let indx;
+      const list = [],
         collections = this.collections,
         sources = this.settings.sources,
         len = sources.length;
@@ -1049,7 +1048,7 @@
     ].join(''),
 
     setRegex : function() {
-      var isCS = this.settings.caseSensitive,
+      const isCS = this.settings.caseSensitive,
         // parts = [':_', ':']
         imgParts = this.vars.emojiImgTemplate.split('${name}'),
         txtParts = this.vars.emojiTxtTemplate.split('${name}');
@@ -1057,13 +1056,13 @@
       // filter = /:_([a-zA-Z\u00c0-\u00ff0-9_,'.+-]*)$|:_([^\x00-\xff]*)$/gi
       // used by atwho.js autocomplete
       this.regex.emojiImgFilter = new RegExp(
-        imgParts[0] + '([a-zA-Z\u00c0-\u00ff0-9_,\'\.\+\-]*)$|' +
+        imgParts[0] + '([a-zA-Z\u00c0-\u00ff0-9_,\'.+-]*)$|' +
         imgParts[0] + '([^\\x00-\\xff]*)$',
         (isCS ? 'g' : 'gi')
       );
 
       this.regex.emojiTxtFilter = new RegExp(
-        txtParts[0] + '([a-zA-Z\u00c0-\u00ff0-9_,\'\.\+\-]*)$|' +
+        txtParts[0] + '([a-zA-Z\u00c0-\u00ff0-9_,\'.+-]*)$|' +
         txtParts[0] + '([^\\x00-\\xff]*)$',
         (isCS ? 'g' : 'gi')
       );
@@ -1088,7 +1087,7 @@
       // regex based on case sensitive setting
       this.setRegex();
 
-      var targets = document.querySelectorAll(this.containers.join(','));
+      const targets = document.querySelectorAll(this.containers.join(','));
       Array.prototype.forEach.call(targets, function(target) {
         new MutationObserver(function(mutations) {
           mutations.forEach(function(mutation) {
