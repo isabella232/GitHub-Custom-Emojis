@@ -894,8 +894,8 @@
       GM_addStyle([
         // settings panel
         '#ghe-menu:hover { cursor:pointer }',
-        '#ghe-settings { position:fixed; z-index:65535; top:0; bottom:0; left:0; right:0; opacity:0; visibility:hidden }',
-        '#ghe-settings.in { opacity:1; visibility:visible; background:rgba(0,0,0,.5) }',
+        '#ghe-settings { position:fixed; z-index:-1; top:0; bottom:0; left:0; right:0; opacity:0; visibility:hidden }',
+        '#ghe-settings.in { opacity:1; visibility:visible; z-index:65535; background:rgba(0,0,0,.5) }',
         '#ghe-settings-inner { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:25rem; box-shadow:0 .5rem 1rem #111; color:#c0c0c0 }',
         '#ghe-settings label { margin-left:.5rem; position:relative; top:-1px }',
         '#ghe-settings .ghe-remove { float:right; margin-top:2px; padding:4px; cursor:pointer }',
