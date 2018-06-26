@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Custom Emojis
-// @version     0.2.6
+// @version     0.2.7
 // @description Add custom emojis from json source
 // @license     MIT
 // @author      Rob Garrison
